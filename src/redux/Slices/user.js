@@ -12,6 +12,18 @@ export const postUser = createAsyncThunk("postUser", async ({userData}) => {
     }
   });
 
+  export const checkUserMark = createAsyncThunk("checkUserMark", async ({answers}) => {
+    try {
+      const id = localStorage.getItem("userId")
+      const response = await axios.put(`http://localhost:4444/user/${id}`, answers);
+      console.log(response.data);
+      localStorage.setItem("userId", response.data.data._id)
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
 
 
 export const user = createSlice({

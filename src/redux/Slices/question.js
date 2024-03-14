@@ -13,14 +13,14 @@ export const getQuestion = createAsyncThunk("getQuestion", async ({ page, pageSi
 });
 
 
-export const updateQuestion = createAsyncThunk("updateQuestion", async ({id, questionData}) => {
-    try {
-      const response = await axios.put(`http://localhost:4444/question/${id}`, questionData);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-    }
-  });
+// export const Question = createAsyncThunk("updateQuestion", async ({id, questionData}) => {
+//     try {
+//       const response = await axios.put(`http://localhost:4444/question/${id}`, questionData);
+//       return response.data;
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   });
 
 
 
