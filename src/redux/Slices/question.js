@@ -1,22 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const getQuestion = createAsyncThunk("getQuestion", async () => {
+
+export const getQuestion = createAsyncThunk("getQuestion", async ({ page, pageSize}) => {
   try {
-    console.log("hai");
-    const response = await axios.get(`http://localhost:4444/question`);
-    // const startIndex = (page - 1) * pageSize;
-    // const endIndex = page * pageSize;
-
-    // const paginatedQuestions = data.slice(startIndex, endIndex);
-
-    // const totalPages = Math.ceil(data.length / pageSize);
-    console.log(response.data);
+    const response = await axios.get(`http://localhost:4444/question?page=${page}&pageSize=${pageSize}`);
     return response.data;
   } catch (error) {
     console.log(error);
+    throw error; 
   }
 });
+
 
 export const updateQuestion = createAsyncThunk("updateQuestion", async ({id, questionData}) => {
     try {

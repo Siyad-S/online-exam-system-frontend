@@ -39,11 +39,11 @@ body {
     background-color: #cccccc;
     cursor: not-allowed;
   }
-  form {
+  /* form {
     width: 50%;
     margin-left: 25%;
     margin-top: 8%;
-  }
+  } */
   .options {
     display: grid;
   }

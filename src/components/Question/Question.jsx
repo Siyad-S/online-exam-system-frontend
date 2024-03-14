@@ -1,62 +1,92 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Question.css";
 import { useFormik } from "formik";
-import question, {
-  getQuestion,
-  updateQuestion,
-} from "../../redux/Slices/question";
 import { useDispatch, useSelector } from "react-redux";
+import { getQuestion } from "../../redux/Slices/question";
 
 const Question = () => {
   const dispatch = useDispatch();
   const allQuestions = useSelector((state) => state.questions.all.data);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    dispatch(getQuestion());
+    dispatch(getQuestion({ page: currentPage, pageSize }));
   }, []);
 
-  console.log(allQuestions);
+  const pageSize = allQuestions?.length
+
+
+  const totalPages = allQuestions ? allQuestions.length : 0;
+
   const formik = useFormik({
     initialValues: {
-        answer: []
+      answer: [],
     },
     onSubmit: (values) => {
-
     },
   });
+
+  const handleNext = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div>
-      <form id="questionForm">
-        {allQuestions?.map((question, index) => (
-          <>
-            <div key={index}>
-              <h2>Question{index + 1}</h2>
-              <h4>{question.question}</h4>
+      {allQuestions &&
+        allQuestions.length > 0 &&
+        currentPage < totalPages && (
+          <form id="questionForm">
+            <div key={currentPage}>
+              <h2>Question {currentPage + 1}</h2>
+              <h4>{allQuestions[currentPage].question}</h4>
               <p>Please select your answer:</p>
               <div className="options">
-                {question?.answers?.map((answer, answerIndex) => (
-                  <label key={answerIndex}>
-                    <input type="radio" name="answer" value={formik.values.answer} onChange={formik.handleChange} />
-                    {answer.answer}
-                  </label>
-                ))}
+                {allQuestions[currentPage]?.answers?.map(
+                  (answer, answerIndex) => (
+                    <label key={answerIndex}>
+                      <input
+                        type="radio"
+                        name="answer"
+                        value={answer.answer}
+                        onChange={formik.handleChange}
+                        checked={
+                          formik.values.answer === answer.answer
+                        }
+                      />
+                      {answer.answer}
+                    </label>
+                  )
+                )}
               </div>
             </div>
             <div className="buttons">
               <button
                 type="button"
                 id="prevBtn"
-                // onClick="goToPreviousQuestion()"
+                onClick={handlePrevious}
+                disabled={currentPage === 0}
               >
                 Previous
               </button>
-              <button type="submit" id="nextBtn" disabled>
+              <button
+                type="button"
+                id="nextBtn"
+                onClick={handleNext}
+                disabled={currentPage === totalPages - 1}
+              >
                 Next
               </button>
             </div>
-          </>
-        ))}
-      </form>
+          </form>
+        )}
     </div>
   );
 };
