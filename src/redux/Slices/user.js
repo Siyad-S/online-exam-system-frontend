@@ -1,30 +1,33 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const postUser = createAsyncThunk("postUser", async ({userData}) => {
+export const postUser = createAsyncThunk("postUser", async ({ userData }) => {
+  try {
+    const response = await axios.post(`http://localhost:4444/user`, userData);
+    localStorage.setItem("userId", response.data.data._id);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+});
+
+export const checkUserMark = createAsyncThunk(
+  "checkUserMark",
+  async ({ questionId, answers }) => {
     try {
-      const response = await axios.post(`http://localhost:4444/user`, userData);
-      console.log(response.data);
-      localStorage.setItem("userId", response.data.data._id)
+      const id = localStorage.getItem("userId");
+      const response = await axios.put(`http://localhost:4444/user/${id}`, {
+        answers,
+        questionId,
+      });
+      localStorage.setItem("userId", response.data.data._id);
       return response.data;
     } catch (error) {
       console.log(error);
-    }
-  });
-
-  export const checkUserMark = createAsyncThunk("checkUserMark", async ({answers}) => {
-    try {
-      const id = localStorage.getItem("userId")
-      const response = await axios.put(`http://localhost:4444/user/${id}`, answers);
-      console.log(response.data);
-      localStorage.setItem("userId", response.data.data._id)
-      return response.data;
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-
+      throw error;
+  }
+});
 
 export const user = createSlice({
   name: "users",
@@ -33,9 +36,6 @@ export const user = createSlice({
     all: [],
   },
   reducers: {},
-//   extraReducers: (builder) => {
-
-//   },
 });
 
 export default user.reducer;
