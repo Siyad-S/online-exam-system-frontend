@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getQuestion } from "../../redux/Slices/question";
 import { checkUserMark } from "../../redux/Slices/user";
 import { useNavigate } from "react-router-dom";
+import * as Yup from 'yup';
 
 const Question = () => {
   const dispatch = useDispatch();
@@ -19,11 +20,18 @@ const Question = () => {
 
   const pageSize = allQuestions?.length;
   const totalPages = allQuestions ? allQuestions.length : 0;
+
+  const validationSchema = Yup.object().shape({
+    [`answer${currentPage}`]: Yup.string().required("Please select an answer"),
+  });
+
   const formik = useFormik({
     initialValues: {},
+    validationSchema: validationSchema,
     onSubmit: (values) => {
       dispatch(checkUserMark({ answers: answerData }));
-      navigate("/result")
+      localStorage.removeItem("userId");
+      navigate("/result");
     },
   });
 
@@ -62,7 +70,7 @@ const Question = () => {
       },
     ]);
 
-      formik.handleSubmit();
+    formik.handleSubmit();
   };
 
   console.log(currentPage);
@@ -94,6 +102,9 @@ const Question = () => {
                 )
               )}
             </div>
+            {formik.errors[`answer${currentPage}`] && formik.touched[`answer${currentPage}`] && (
+              <div className="error">{formik.errors[`answer${currentPage}`]}</div>
+            )}
           </div>
           <div className="buttons">
             <button
@@ -106,7 +117,7 @@ const Question = () => {
             </button>
 
             {currentPage === totalPages - 1 && (
-              <button type="submit" id="nextBtn">
+              <button type="button" id="nextBtn" onClick={handleSubmit}>
                 Submit Exam
               </button>
             )}
