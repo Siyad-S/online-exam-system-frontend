@@ -4,12 +4,14 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuestion } from "../../redux/Slices/question";
 import { checkUserMark } from "../../redux/Slices/user";
+import { useNavigate } from "react-router-dom";
 
 const Question = () => {
   const dispatch = useDispatch();
   const allQuestions = useSelector((state) => state.questions.all.data);
   const [currentPage, setCurrentPage] = useState(0);
   const [answerData, setAnswerData] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getQuestion({ page: currentPage, pageSize }));
@@ -17,49 +19,16 @@ const Question = () => {
 
   const pageSize = allQuestions?.length;
   const totalPages = allQuestions ? allQuestions.length : 0;
-
   const formik = useFormik({
     initialValues: {},
     onSubmit: (values) => {
-      if (currentPage === totalPages - 1) {
-        dispatch(checkUserMark({ answers: answerData }));
-      }
+      dispatch(checkUserMark({ answers: answerData }));
+      navigate("/result")
     },
   });
 
   const handleNext = () => {
     if (currentPage < totalPages - 1) {
-      const answerKey = `answer${currentPage}`;
-      const questionId = allQuestions[currentPage]._id;
-
-      setAnswerData((prevData) => [
-        ...prevData,
-        {
-          answer: formik.values[answerKey],
-          questionId: questionId,
-        },
-      ]);
-
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (currentPage === totalPages - 1) {
-      const answerKey = `answer${currentPage}`;
-      const questionId = allQuestions[currentPage]._id;
-
-      setAnswerData((prevData) => [
-        ...prevData,
-        {
-          answer: formik.values[answerKey],
-          questionId: questionId,
-        },
-      ]);
-
-      formik.handleSubmit();
-      
-    } else {
       const answerKey = `answer${currentPage}`;
       const questionId = allQuestions[currentPage]._id;
 
@@ -81,11 +50,27 @@ const Question = () => {
     }
   };
 
-  console.log(answerData);
+  const handleSubmit = () => {
+    const answerKey = `answer${currentPage}`;
+    const questionId = allQuestions[currentPage]._id;
+
+    setAnswerData((prevData) => [
+      ...prevData,
+      {
+        answer: formik.values[answerKey],
+        questionId: questionId,
+      },
+    ]);
+
+      formik.handleSubmit();
+  };
+
+  console.log(currentPage);
+  console.log(totalPages);
 
   return (
     <div>
-      {allQuestions && allQuestions.length > 0 && currentPage < totalPages && (
+      {allQuestions && allQuestions.length > 0 && (
         <form id="questionForm" onSubmit={formik.handleSubmit}>
           <div key={currentPage}>
             <h2>Question {currentPage + 1}</h2>
@@ -120,15 +105,17 @@ const Question = () => {
               Previous
             </button>
 
-            <button
-              type={currentPage === totalPages - 1 ? "submit" : "button"}
-              id="nextBtn"
-              onClick={
-                currentPage !== totalPages - 1 ? handleNext : handleSubmit
-              }
-            >
-              {currentPage !== totalPages - 1 ? "Next" : "Submit Exam"}
-            </button>
+            {currentPage === totalPages - 1 && (
+              <button type="submit" id="nextBtn">
+                Submit Exam
+              </button>
+            )}
+
+            {currentPage !== totalPages - 1 && (
+              <button type="button" id="nextBtn" onClick={handleNext}>
+                Next
+              </button>
+            )}
           </div>
         </form>
       )}
