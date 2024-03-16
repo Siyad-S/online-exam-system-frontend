@@ -24,13 +24,16 @@ const Result = () => {
           Your score: <span id="score">{markNum}</span>
         </p>
         <p style={{ color: "green" }}>
-          Correct answers:{" "}
-          <span id="correct-score">{correctedNum}</span>
+          Correct answers: <span id="correct-score">{correctedNum}</span>
         </p>
         <p style={{ color: "red" }}>
           Wrong answers: <span id="wrong-score">{incorrectNum}</span>
         </p>
-        <p>You have successfully passed the exam.</p>
+        {markNum > 25 ? (
+          <p>You have successfully passed the exam.</p>
+        ) : (
+          <p>You have failed the exam.</p>
+        )}
         <a href="/">Take Exam Again</a>
       </div>
     </div>
